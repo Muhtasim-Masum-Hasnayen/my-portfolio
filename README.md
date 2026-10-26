@@ -1,6 +1,6 @@
 # 🚀 My Portfolio Website — Muhtasim Masum Hasnayen
 <p align="center">
-  <img src="./portfolio_.gif" alt="Muhtasim Masum Hasnayen's Portfolio" width="100%">
+  <img src="./portfolio_.gif" alt="Muhtasim Masum Hasnayen's Portfolio" width="50%">
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Portfolio-Live-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Portfolio" />
