@@ -100,6 +100,18 @@ body {
   margin-bottom: -100px;
 }
 
+.techstack-slot {
+  width: 100%;
+  height: var(--vh);
+  position: relative;
+  margin: 50px auto -100px;
+}
+
+.techstack-slot .techstack {
+  height: 100%;
+  margin: 0;
+}
+
 .techstack h2 {
   font-size: 80px;
   text-align: center;

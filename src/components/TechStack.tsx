@@ -135,17 +135,7 @@ const TechStack = () => {
         .getBoundingClientRect().top;
       setIsActive(scrollY > threshold);
     };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 10);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1000);
-      });
-    });
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -171,6 +161,7 @@ const TechStack = () => {
       <h2> My Techstack</h2>
 
       <Canvas
+        frameloop={isActive ? "always" : "demand"}
         shadows
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
         camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}

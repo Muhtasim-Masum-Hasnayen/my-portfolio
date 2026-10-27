@@ -4,11 +4,7 @@ import gsap from "gsap";
 export function setCharTimeline(
   character: THREE.Object3D<THREE.Object3DEventMap> | null,
   camera: THREE.PerspectiveCamera
-) {
-  let intensity: number = 0;
-  setInterval(() => {
-    intensity = Math.random();
-  }, 200);
+): () => void {
   const tl1 = gsap.timeline({
     scrollTrigger: {
       trigger: ".landing-section",
@@ -37,6 +33,7 @@ export function setCharTimeline(
     },
   });
   let screenLight: any, monitor: any;
+  let screenLightTimeline: gsap.core.Timeline | undefined;
   character?.children.forEach((object: any) => {
     if (object.name === "Plane004") {
       object.children.forEach((child: any) => {
@@ -52,8 +49,11 @@ export function setCharTimeline(
       object.material.transparent = true;
       object.material.opacity = 0;
       object.material.emissive.set("#C8BFFF");
-      gsap.timeline({ repeat: -1, repeatRefresh: true }).to(object.material, {
-        emissiveIntensity: () => intensity * 8,
+      screenLightTimeline = gsap.timeline({
+        repeat: -1,
+        repeatRefresh: true,
+      }).to(object.material, {
+        emissiveIntensity: () => Math.random() * 8,
         duration: () => Math.random() * 0.6,
         delay: () => Math.random() * 0.1,
       });
@@ -130,9 +130,16 @@ export function setCharTimeline(
       tM2.to(".what-box-in", { display: "flex", duration: 0.1, delay: 0 }, 0);
     }
   }
+
+  return () => {
+    tl1.kill();
+    tl2.kill();
+    tl3.kill();
+    screenLightTimeline?.kill();
+  };
 }
 
-export function setAllTimeline() {
+export function setAllTimeline(): () => void {
   const careerTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: ".career-section",
@@ -188,4 +195,6 @@ export function setAllTimeline() {
       0
     );
   }
+
+  return () => careerTimeline.kill();
 }
