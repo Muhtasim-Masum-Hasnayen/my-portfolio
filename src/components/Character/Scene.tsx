@@ -23,15 +23,28 @@ const Scene = () => {
   useEffect(() => {
     if (!canvasDiv.current) return;
 
+    const progress = setProgress(setLoading);
     const canvas = canvasDiv.current;
     const rect = canvas.getBoundingClientRect();
     const scene = sceneRef.current;
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: false,
+        powerPreference: "high-performance",
+      });
+    } catch (error) {
+      console.error(
+        "WebGL is unavailable; continuing without the 3D character:",
+        error
+      );
+      progress.clear();
+      return;
+    }
     const setRendererSize = () => {
       const { width, height } = canvas.getBoundingClientRect();
-      renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1 : 1.5)
-      );
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
       renderer.setSize(width, height);
     };
     setRendererSize();
@@ -57,6 +70,7 @@ const Scene = () => {
     let introTimeout: number | undefined;
     let touchTimeout: number | undefined;
     let disposed = false;
+    const loadController = new AbortController();
     let mouse = { x: 0, y: 0 };
     let interpolation = { x: 0.1, y: 0.2 };
     let cleanupHover: (() => void) | undefined;
@@ -64,9 +78,13 @@ const Scene = () => {
     let cleanupAllTimeline: (() => void) | undefined;
 
     const light = setLighting(scene);
-    const progress = setProgress((value) => setLoading(value));
-    const { loadCharacter } = setCharacter(renderer, scene, camera);
+    const { loadCharacter } = setCharacter(renderer, scene, camera, (value) =>
+      progress.update(value)
+    );
     const landingDiv = document.getElementById("landingDiv");
+    const loadTimeout = window.setTimeout(() => {
+      if (!character) progress.clear();
+    }, 15000);
 
     const onMouseMove = (event: MouseEvent) => {
       handleMouseMove(event, (x, y) => (mouse = { x, y }));
@@ -133,9 +151,10 @@ const Scene = () => {
     }
     animate();
 
-    loadCharacter()
+    loadCharacter(loadController.signal)
       .then((gltf) => {
         if (!gltf || disposed) return;
+        window.clearTimeout(loadTimeout);
         const animations = setAnimations(gltf);
         cleanupHover = hoverDivRef.current
           ? animations.hover(gltf, hoverDivRef.current)
@@ -147,23 +166,28 @@ const Scene = () => {
         screenLight = character.getObjectByName("screenlight") || null;
         cleanupCharacterTimeline = setCharTimeline(character, camera);
         cleanupAllTimeline = setAllTimeline();
-        progress.loaded().then(() => {
-          if (disposed) return;
-          introTimeout = window.setTimeout(() => {
-            light.turnOnLights();
-            animations.startIntro();
-          }, 2500);
-        });
+        void progress.loaded();
+        if (disposed) return;
+        introTimeout = window.setTimeout(() => {
+          light.turnOnLights();
+          animations.startIntro();
+        }, 2500);
       })
       .catch((error: unknown) => {
-        if (!disposed) console.error("Unable to load the 3D character:", error);
+        window.clearTimeout(loadTimeout);
+        if (!disposed) {
+          console.error("Unable to load the 3D character:", error);
+          progress.clear();
+        }
       });
 
     return () => {
       disposed = true;
+      loadController.abort();
       cancelAnimationFrame(frameId);
       window.clearTimeout(touchTimeout);
       window.clearTimeout(introTimeout);
+      window.clearTimeout(loadTimeout);
       cleanupHover?.();
       cleanupCharacterTimeline?.();
       cleanupAllTimeline?.();
@@ -181,7 +205,7 @@ const Scene = () => {
         canvas.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [setLoading]);
 
   return (
     <>

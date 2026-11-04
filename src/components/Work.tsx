@@ -8,43 +8,46 @@ gsap.registerPlugin(useGSAP);
 
 const Work = () => {
   useGSAP(() => {
-  let translateX: number = 0;
+  const media = gsap.matchMedia();
 
-  function setTranslateX() {
-    const box = document.getElementsByClassName("work-box");
-    const rectLeft = document
-      .querySelector(".work-container")!
-      .getBoundingClientRect().left;
-    const rect = box[0].getBoundingClientRect();
-    const parentWidth = box[0].parentElement!.getBoundingClientRect().width;
-    let padding: number =
-      parseInt(window.getComputedStyle(box[0]).padding) / 2;
-    translateX = rect.width * box.length - (rectLeft + parentWidth) + padding;
-  }
+  media.add("(min-width: 1025px)", () => {
+    const boxes = document.querySelectorAll<HTMLElement>(".work-box");
+    const container = document.querySelector<HTMLElement>(".work-container");
+    const firstBox = boxes[0];
+    if (!firstBox || !container) return;
 
-  setTranslateX();
+    const rectLeft = container.getBoundingClientRect().left;
+    const parentWidth = firstBox.parentElement?.getBoundingClientRect().width;
+    if (parentWidth === undefined) return;
 
-  let timeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: ".work-section",
-      start: "top top",
-      end: `+=${translateX}`, // Use actual scroll width
-      scrub: true,
-      pin: true,
-      id: "work",
-    },
+    const padding = parseInt(window.getComputedStyle(firstBox).padding, 10) / 2;
+    const translateX = firstBox.getBoundingClientRect().width * boxes.length -
+      (rectLeft + parentWidth) +
+      padding;
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".work-section",
+        start: "top top",
+        end: `+=${translateX}`,
+        scrub: true,
+        pin: true,
+        id: "work",
+      },
+    });
+
+    timeline.to(".work-flex", {
+      x: -translateX,
+      ease: "none",
+    });
+
+    return () => {
+      timeline.kill();
+      ScrollTrigger.getById("work")?.kill();
+    };
   });
 
-  timeline.to(".work-flex", {
-    x: -translateX,
-    ease: "none",
-  });
-
-  // Clean up (optional, good practice)
-  return () => {
-    timeline.kill();
-    ScrollTrigger.getById("work")?.kill();
-  };
+  return () => media.revert();
 }, []);
   return (
    <div className="work-section" id="work">

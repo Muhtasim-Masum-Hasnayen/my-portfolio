@@ -49,6 +49,8 @@ const WorkImage = (props: Props) => {
               : `/images/${props.image}`
           }
           alt={props.alt || "Project preview"}
+          loading="lazy"
+          decoding="async"
         />
 
         {isVideo && video && (

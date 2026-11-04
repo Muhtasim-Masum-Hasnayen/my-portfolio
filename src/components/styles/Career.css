@@ -213,4 +213,15 @@
     place-items: inherit;
     justify-content: left;
   }
+
+  .career-info h4 {
+    width: auto;
+    font-size: 19px;
+    line-height: 1.25;
+  }
+
+  .career-info h5 {
+    font-size: 15px;
+    line-height: 1.4;
+  }
 }

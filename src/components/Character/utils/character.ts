@@ -5,52 +5,68 @@ import { decryptFile } from "./decrypt";
 const setCharacter = (
   renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
-  camera: THREE.PerspectiveCamera
+  camera: THREE.PerspectiveCamera,
+  onProgress?: (percent: number) => void
 ) => {
-  const loader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
+  const loadingManager = new THREE.LoadingManager();
+  const loader = new GLTFLoader(loadingManager);
+  const dracoLoader = new DRACOLoader(loadingManager);
   dracoLoader.setDecoderPath("/draco/");
+  dracoLoader.setWorkerLimit(2);
   loader.setDRACOLoader(dracoLoader);
 
-  const loadCharacter = () => {
-    return new Promise<GLTF | null>(async (resolve, reject) => {
-      try {
-        const encryptedBlob = await decryptFile(
-          "/models/character.enc",
-          "Character3D#@"
-        );
-        const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
+  const loadCharacter = async (signal: AbortSignal) => {
+    onProgress?.(2);
+    const encryptedBlob = await decryptFile(
+      "/models/character.enc",
+      "Character3D#@",
+      (progress) => onProgress?.(5 + progress * 50),
+      signal
+    );
+    if (signal.aborted) throw signal.reason;
+    const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
 
-        let character: THREE.Object3D;
+    try {
+      const gltf = await new Promise<GLTF>((resolve, reject) => {
+        const handleAbort = () => {
+          reject(signal.reason);
+        };
+        signal.addEventListener("abort", handleAbort, { once: true });
+
         loader.load(
           blobUrl,
-          async (gltf) => {
-            character = gltf.scene;
-            await renderer.compileAsync(character, camera, scene);
-            character.traverse((child: any) => {
-              if (child.isMesh) {
-                const mesh = child as THREE.Mesh;
-                child.castShadow = true;
-                child.receiveShadow = true;
-                mesh.frustumCulled = true;
-              }
-            });
-            resolve(gltf);
-            character!.getObjectByName("footR")!.position.y = 3.36;
-            character!.getObjectByName("footL")!.position.y = 3.36;
-            dracoLoader.dispose();
+          (loadedGltf) => {
+            signal.removeEventListener("abort", handleAbort);
+            resolve(loadedGltf);
           },
-          undefined,
+          (event) => {
+            if (event.total > 0) {
+              onProgress?.(55 + (event.loaded / event.total) * 35);
+            }
+          },
           (error) => {
-            console.error("Error loading GLTF model:", error);
+            signal.removeEventListener("abort", handleAbort);
             reject(error);
           }
         );
-      } catch (err) {
-        reject(err);
-        console.error(err);
-      }
-    });
+
+        if (signal.aborted) handleAbort();
+      });
+
+      const rightFoot = gltf.scene.getObjectByName("footR");
+      const leftFoot = gltf.scene.getObjectByName("footL");
+      if (rightFoot) rightFoot.position.y = 3.36;
+      if (leftFoot) leftFoot.position.y = 3.36;
+
+      onProgress?.(95);
+      void renderer.compileAsync(gltf.scene, camera, scene).catch((error: unknown) => {
+        console.error("Unable to precompile the 3D character:", error);
+      });
+      return gltf;
+    } finally {
+      URL.revokeObjectURL(blobUrl);
+      dracoLoader.dispose();
+    }
   };
 
   return { loadCharacter };

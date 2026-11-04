@@ -94,32 +94,29 @@ body {
 .techstack {
   width: 100%;
   position: relative;
-  height: var(--vh);
+  min-height: var(--vh);
+  height: auto;
   margin: auto;
   margin-top: 50px;
-  margin-bottom: -100px;
+  margin-bottom: 0;
 }
 
 .techstack-slot {
   width: 100%;
-  height: var(--vh);
+  min-height: var(--vh);
+  height: auto;
   position: relative;
-  margin: 50px auto -100px;
+  margin: 50px auto 0;
 }
 
 .techstack-slot .techstack {
-  height: 100%;
+  height: auto;
   margin: 0;
 }
 
 .techstack h2 {
-  font-size: 80px;
-  text-align: center;
-  position: absolute;
-  width: 100%;
-  top: 120px;
-  left: 0;
-  font-weight: 400;
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 500;
   text-transform: uppercase;
 }
 
@@ -129,7 +126,7 @@ body {
   }
 }
 @media screen and (max-width: 900px) {
-  .techstack h2 {
-    font-size: 40px;
+  .techstack-slot {
+    min-height: auto;
   }
 }

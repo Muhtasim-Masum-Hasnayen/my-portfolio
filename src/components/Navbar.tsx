@@ -23,21 +23,29 @@ const Navbar = () => {
     smoother.scrollTop(0);
     smoother.paused(true);
 
-    let links = document.querySelectorAll(".header ul a");
-    links.forEach((elem) => {
-      let element = elem as HTMLAnchorElement;
-      element.addEventListener("click", (e) => {
-        if (window.innerWidth > 1024) {
-          e.preventDefault();
-          let elem = e.currentTarget as HTMLAnchorElement;
-          let section = elem.getAttribute("data-href");
-          smoother.scrollTo(section, true, "top top");
-        }
-      });
-    });
-    window.addEventListener("resize", () => {
+    const links = document.querySelectorAll<HTMLAnchorElement>(".header ul a");
+    const handleLinkClick = (event: MouseEvent) => {
+      if (window.innerWidth <= 1024) return;
+      event.preventDefault();
+      const section = (event.currentTarget as HTMLAnchorElement).getAttribute(
+        "data-href"
+      );
+      if (section) smoother.scrollTo(section, true, "top top");
+    };
+    const handleResize = () => {
       ScrollSmoother.refresh(true);
-    });
+    };
+
+    links.forEach((link) => link.addEventListener("click", handleLinkClick));
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      links.forEach((link) =>
+        link.removeEventListener("click", handleLinkClick)
+      );
+      window.removeEventListener("resize", handleResize);
+      smoother.kill();
+    };
   }, []);
   return (
     <>
@@ -95,6 +103,11 @@ const Navbar = () => {
           <li>
             <a data-href="#about" href="#about">
               <HoverLinks text="ABOUT" />
+            </a>
+          </li>
+          <li>
+            <a data-href="#education" href="#education">
+              <HoverLinks text="EDUCATION" />
             </a>
           </li>
           <li>

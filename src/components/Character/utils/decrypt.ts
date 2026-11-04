@@ -12,12 +12,50 @@ async function generateAESKey(password: string): Promise<CryptoKey> {
 
 export const decryptFile = async (
   url: string,
-  password: string
+  password: string,
+  onProgress?: (progress: number) => void,
+  signal?: AbortSignal
 ): Promise<ArrayBuffer> => {
-  const response = await fetch(url);
-  const encryptedData = await response.arrayBuffer();
-  const iv = new Uint8Array(encryptedData.slice(0, 16));
-  const data = encryptedData.slice(16);
+  const response = await fetch(url, { signal });
+  if (!response.ok) {
+    throw new Error(`Unable to download encrypted model (${response.status})`);
+  }
+
+  const contentLength = Number(response.headers.get("content-length"));
+  const reader = response.body?.getReader();
+  let encryptedData: Uint8Array;
+
+  if (reader && contentLength > 0) {
+    const chunks: Uint8Array[] = [];
+    let received = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+
+      chunks.push(value);
+      received += value.byteLength;
+      onProgress?.(received / contentLength);
+    }
+
+    encryptedData = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) {
+      encryptedData.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+  } else {
+    encryptedData = new Uint8Array(await response.arrayBuffer());
+    onProgress?.(1);
+  }
+
+  if (encryptedData.byteLength <= 16) {
+    throw new Error("The encrypted model file is empty or incomplete.");
+  }
+
+  const iv = encryptedData.subarray(0, 16);
+  const data = encryptedData.subarray(16);
   const key = await generateAESKey(password);
   return crypto.subtle.decrypt({ name: "AES-CBC", iv }, key, data);
 };

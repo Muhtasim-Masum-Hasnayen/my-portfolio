@@ -40,7 +40,6 @@
   transform: translate(-50%, -50%);
   display: flex;
   font-size: 23px;
-  will-change: left, top;
   transition: transform 0.3s ease-out;
 }
 .resume-button {
@@ -99,5 +98,24 @@ div.resume-button span {
   div.resume-button span {
     font-size: 23px;
     margin-top: -1.5px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .resume-button {
+    right: 15px;
+    bottom: 14px;
+    transform: none;
+    gap: 5px;
+    padding: 8px 10px;
+    border: 1px solid rgba(194, 164, 255, 0.4);
+    background: rgba(11, 8, 12, 0.85);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
+  div.resume-button span {
+    font-size: 15px;
   }
 }

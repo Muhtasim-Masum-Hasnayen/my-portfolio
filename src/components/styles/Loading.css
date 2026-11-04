@@ -361,3 +361,31 @@
     font-size: 18px;
   }
 }
+
+@media only screen and (max-width: 499px) {
+  .loading-marquee {
+    font-size: 28px;
+  }
+
+  .loading-marquee span {
+    padding: 0 24px;
+  }
+
+  .loading-marquee span::before {
+    width: 12px;
+    height: 12px;
+  }
+
+  .loading-button {
+    padding: 16px 38px;
+    font-size: 15px;
+  }
+
+  .loading-container {
+    left: 38px;
+  }
+
+  .loading-header {
+    padding: 14px 0;
+  }
+}
