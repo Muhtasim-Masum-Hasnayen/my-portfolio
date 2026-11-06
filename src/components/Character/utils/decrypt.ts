@@ -22,10 +22,10 @@ export const decryptFile = async (
   }
 
   const contentLength = Number(response.headers.get("content-length"));
-  const reader = response.body?.getReader();
   let encryptedData: Uint8Array;
 
-  if (reader && contentLength > 0) {
+  if (response.body && contentLength > 0) {
+    const reader = response.body.getReader();
     const chunks: Uint8Array[] = [];
     let received = 0;
 
