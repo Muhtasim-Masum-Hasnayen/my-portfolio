@@ -7,10 +7,12 @@ import {
 } from "react-icons/fa6";
 import "./styles/SocialIcons.css";
 import { TbNotes } from "react-icons/tb";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import HoverLinks from "./HoverLinks";
 
 const SocialIcons = () => {
+  const [showResumeHint, setShowResumeHint] = useState(false);
+
   useEffect(() => {
     const social = document.getElementById("social") as HTMLElement;
 
@@ -47,6 +49,13 @@ const SocialIcons = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showResumeHint) return;
+
+    const timeout = window.setTimeout(() => setShowResumeHint(false), 8000);
+    return () => window.clearTimeout(timeout);
+  }, [showResumeHint]);
+
   return (
     <div className="icons-section">
       <div className="social-icons" data-cursor="icons" id="social">
@@ -80,12 +89,21 @@ const SocialIcons = () => {
         className="resume-button"
         href="/resume.pdf"
         download="Muhtasim-Masum-Hasnayen-Resume.pdf"
+        onClick={() => setShowResumeHint(true)}
       >
         <HoverLinks text="RESUME" />
         <span>
           <TbNotes />
         </span>
       </a>
+      {showResumeHint && (
+        <p className="resume-download-hint" role="status">
+          Check your Downloads.{" "}
+          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+            Open resume
+          </a>
+        </p>
+      )}
     </div>
   );
 };

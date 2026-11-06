@@ -64,6 +64,26 @@
 .resume-button:hover {
   color: #fff;
 }
+.resume-download-hint {
+  position: absolute;
+  right: 0;
+  bottom: 78px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(194, 164, 255, 0.35);
+  background: rgba(11, 8, 12, 0.95);
+  color: #eae5ec;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.resume-download-hint a {
+  color: var(--accentColor);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 div.resume-button span {
   color: #fff;
   font-size: 17px;
@@ -113,6 +133,12 @@ div.resume-button span {
     font-size: 11px;
     line-height: 1;
     letter-spacing: 1px;
+  }
+
+  .resume-download-hint {
+    right: 15px;
+    bottom: 58px;
+    font-size: 12px;
   }
 
   div.resume-button span {
