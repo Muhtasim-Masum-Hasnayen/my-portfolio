@@ -121,48 +121,50 @@ const skillGroups: {
 const TechStack = () => {
   return (
     <section className="techstack" aria-labelledby="techstack-title">
-      <header className="techstack-heading">
-        <p className="techstack-eyebrow">MY CAPABILITIES</p>
-        <h2 id="techstack-title">TECHNICAL AND SOFT SKILLS</h2>
-        <p className="techstack-description">
-          A balanced toolkit of quality assurance, development, and professional
-          skills.
-        </p>
-      </header>
+      <div className="techstack-container section-container">
+        <header className="techstack-heading">
+          <p className="techstack-eyebrow">MY CAPABILITIES</p>
+          <h2 id="techstack-title">TECHNICAL AND SOFT SKILLS</h2>
+          <p className="techstack-description">
+            A balanced toolkit of quality assurance, development, and
+            professional skills.
+          </p>
+        </header>
 
-      <div className="techstack-groups">
-        {skillGroups.map((group) => (
-          <section
-            className={`techstack-group ${group.className ?? ""}`}
-            key={group.name}
-          >
-            <header className="techstack-group-heading">
-              <h3>{group.name}</h3>
-              {group.description && <p>{group.description}</p>}
-            </header>
+        <div className="techstack-groups">
+          {skillGroups.map((group) => (
+            <section
+              className={`techstack-group ${group.className ?? ""}`}
+              key={group.name}
+            >
+              <header className="techstack-group-heading">
+                <h3>{group.name}</h3>
+                {group.description && <p>{group.description}</p>}
+              </header>
 
-            {group.technologies && (
-              <div className="techstack-logos">
-                {group.technologies.map(({ name, icon: Icon, color }) => (
-                  <div className="techstack-logo-item" key={name}>
-                    <div className="techstack-logo-circle">
-                      <Icon aria-hidden="true" color={color} />
+              {group.technologies && (
+                <div className="techstack-logos">
+                  {group.technologies.map(({ name, icon: Icon, color }) => (
+                    <div className="techstack-logo-item" key={name}>
+                      <div className="techstack-logo-circle">
+                        <Icon aria-hidden="true" color={color} />
+                      </div>
+                      <span>{name}</span>
                     </div>
-                    <span>{name}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
 
-            {group.skills && (
-              <ul className="techstack-skills">
-                {group.skills.map((skill) => (
-                  <li key={skill}>{skill}</li>
-                ))}
-              </ul>
-            )}
-          </section>
-        ))}
+              {group.skills && (
+                <ul className="techstack-skills">
+                  {group.skills.map((skill) => (
+                    <li key={skill}>{skill}</li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
       </div>
     </section>
   );

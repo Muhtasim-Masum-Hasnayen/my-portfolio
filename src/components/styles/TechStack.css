@@ -1,8 +1,9 @@
 .techstack {
-  width: var(--cWidth);
-  max-width: 1120px;
   height: auto;
   min-height: 100%;
+}
+
+.techstack-container {
   margin: 0 auto;
   padding: 100px 0 80px;
   box-sizing: border-box;
@@ -131,7 +132,7 @@
 }
 
 @media screen and (max-width: 640px) {
-  .techstack {
+  .techstack-container {
     padding: 70px 0;
   }
 
