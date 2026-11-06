@@ -99,7 +99,11 @@ const SocialIcons = () => {
       {showResumeHint && (
         <p className="resume-download-hint" role="status">
           Check your Downloads.{" "}
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+          <a
+            href="/resume-view.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Open resume
           </a>
         </p>
