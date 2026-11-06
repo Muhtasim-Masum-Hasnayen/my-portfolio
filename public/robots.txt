@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://my-portfolio-iota-taupe-53.vercel.app/sitemap.xml
